@@ -1,0 +1,46 @@
+#Code
+rankall <- function(disease, number = "best"){
+  outcomedata <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+  outcomedata <- outcomedata[c(2, 7, 11, 17, 23)]
+  names(outcomedata)[1] <- "hname"
+  names(outcomedata)[2] <- "hstate"
+  names(outcomedata)[3] <- "heart attack"
+  names(outcomedata)[4] <- "heart failure"
+  names(outcomedata)[5] <- "pneumonia"
+  diseases = c("heart attack", "heart failure", "pneumonia")
+  if(disease %in% diseases == FALSE) stop("invalid outcome")
+  if(number != "best" && number != "worst" && number%%1 != 0) stop("NA")
+  outcomedata <- outcomedata[outcomedata[disease] != 'Not Available', ]
+  outcomedata[disease] <- as.data.frame(sapply(outcomedata[disease], as.numeric))
+  outcomedata <- outcomedata[order(outcomedata$hname, decreasing = FALSE), ]
+  outcomedata <- outcomedata[order(outcomedata[disease], decreasing = FALSE), ]
+  HospitalRank <- function(dfn, s, n) {
+    dfn <- dfn[dfn$hstate==s, ]
+    AllOutcome <- dfn[,disease]
+    if(n == "best"){
+      num <- which.min(AllOutcome)
+    }else if(n == "worst" ){
+      num <- which.max(AllOutcome)
+    }else{
+      num <- n
+    }
+    dfn[num, ]$hname
+  }
+  Allstates <- outcomedata[, 2]
+  uniquestates <- unique(Allstates)
+  outcomedatanew <- data.frame("hospital"=character(), "htate"=character())
+  for(sta in uniquestates) {
+    hospi <- HospitalRank(outcomedata, sta, number)
+    outcomedatanew <- rbind(outcomedatanew, data.frame(hospital=hospi, state=sta))
+  }
+  outcomedatanew <- outcomedatanew[order(outcomedatanew['state'], decreasing = FALSE), ]
+  outcomedatanew
+}
+
+#Output Function Calls
+r <- rankall("heart attack", 4)
+as.character(subset(r, state == "HI")$hospital)
+r <- rankall("pneumonia", "worst")
+as.character(subset(r, state == "NJ")$hospital)
+r <- rankall("heart failure", 10)
+as.character(subset(r, state == "NV")$hospital)
