@@ -1,0 +1,18 @@
+correlation <- function(directory, threshold = 0) 
+  {
+  files1 <- list.files(directory, full.names = TRUE)
+  data_frame1 <- vector(mode = "numeric")
+  
+  for (i in 1:length(files1)) 
+    {
+    y <- read.csv(files1[i])
+    finalsum <- sum((!is.na(y$nitrate)) & (!is.na(y$sulfate)))
+    if (finalsum > threshold) 
+      {
+      z <- y[which(!is.na(y$sulfate)), ]
+      z1 <- z[which(!is.na(z$nitrate)), ]
+      data_frame1<- c(data_frame1, cor(z1$sulfate, z1$nitrate))
+    }
+  }
+  data_frame1
+}
