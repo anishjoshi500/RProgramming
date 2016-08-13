@@ -1,0 +1,17 @@
+pollutantmean <- function(directory, pollutant, id = 1:332)
+{
+  data_frame <- data.frame();
+  file <- list.files(directory, full.names = TRUE);
+  for (i in id)
+    {
+    data_frame <- rbind(data_frame, read.csv(file[i]))
+  }
+  #data_frame1 <- na.omit(data_frame)
+  if (pollutant == 'nitrate') {
+    print(mean(data_frame$nitrate, na.rm = TRUE))
+  } 
+  else if (pollutant == 'sulfate') 
+    {
+    print(mean(data_frame$sulfate, na.rm = TRUE))
+  }
+}
