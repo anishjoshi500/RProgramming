@@ -1,0 +1,23 @@
+#Code
+best <- function(state, disease){
+  diseases = c("heart attack", "heart failure", "pneumonia")
+  if(disease %in% diseases == FALSE) stop("invalid outcome")
+  outcomedata <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+  outcomedata <- outcomedata[c(2, 7, 11, 17, 23)]
+  names(outcomedata)[1] <- "hname"
+  names(outcomedata)[2] <- "hstate"
+  names(outcomedata)[3] <- "heart attack"
+  names(outcomedata)[4] <- "heart failure"
+  names(outcomedata)[5] <- "pneumonia"
+  Allstates <- outcomedata[, 2]
+  uniquestates <- unique(Allstates)
+  if(state %in% Allstates == FALSE) stop("invalid state")
+  outcomedata <- outcomedata[outcomedata$hstate==state & outcomedata[disease] != 'Not Available', ]
+  AllOutcome <- outcomedata[, disease]
+  minimum <- which.min(AllOutcome)
+  outcomedata[minimum, ]$hname
+}
+#Output Function Calls
+best("SC", "heart attack")
+best("NY", "pneumonia")
+best("AK", "pneumonia")
