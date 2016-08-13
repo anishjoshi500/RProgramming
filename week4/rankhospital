@@ -1,0 +1,35 @@
+#Code
+rankhospital <- function(state, disease, number = "best") {
+  outcomedata <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+  outcomedata <- outcomedata[c(2, 7, 11, 17, 23)]
+  names(outcomedata)[1] <- "hname"
+  names(outcomedata)[2] <- "hstate"
+  names(outcomedata)[3] <- "heart attack"
+  names(outcomedata)[4] <- "heart failure"
+  names(outcomedata)[5] <- "pneumonia"
+  diseases = c("heart attack", "heart failure", "pneumonia")
+  if(disease %in% diseases == FALSE) stop("invalid outcome")
+  Allstates <- outcomedata[, 2]
+  uniquestates <- unique(Allstates)
+  if(state %in% uniquestates == FALSE) stop("invalid state")
+  if(number != "best" && number != "worst" && number%%1 != 0) stop("NA")
+  outcomedata <- outcomedata[outcomedata$hstate==state & outcomedata[disease] != 'Not Available', ]
+  outcomedata[disease] <- as.data.frame(sapply(outcomedata[disease], as.numeric))
+  outcomedata <- outcomedata[order(outcomedata$hname, decreasing = FALSE), ]
+  outcomedata <- outcomedata[order(outcomedata[disease], decreasing = FALSE), ]
+  AllOutcome <- outcomedata[, disease]
+  if(number == "best"){
+    num <- which.min(AllOutcome)
+  }else if(number == "worst"){
+    num <- which.max(AllOutcome)
+  }else{
+    num <- number
+  }
+  outcomedata[num, ]$hname
+}
+
+#Output Function Calls
+rankhospital("WA", "heart attack", 7)
+rankhospital("TX", "pneumonia", 10)
+rankhospital("NY", "heart attack", 7)
+rankhospital("NC", "heart attack", "worst")
